@@ -4,7 +4,7 @@ channels:
   - https://repo.anaconda.com/pkgs/main
   - https://repo.anaconda.com/pkgs/r
 dependencies:
-  - anyio=4.7.0=py310hca03da5_0
+  - anyio=4.7.0
   - appnope=0.1.2=py310hca03da5_1001
   - argon2-cffi=21.3.0=pyhd3eb1b0_0
   - argon2-cffi-bindings=21.2.0=py310h80987f9_1
