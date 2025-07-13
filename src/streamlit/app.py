@@ -1,7 +1,10 @@
 import streamlit as st
 from pages import exploration, dataviz, modelisation, deeplearning 
 
+import sys
+import streamlit as st
 
+st.write(f"Python utilisé : {sys.executable}")
 
 st.set_page_config(page_title="Projet Accidents routiers", layout="wide")
 
