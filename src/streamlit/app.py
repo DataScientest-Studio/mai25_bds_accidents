@@ -1,12 +1,13 @@
 import streamlit as st
-from pages import exploration, dataviz, modelisation, deeplearning 
 
 import sys
-import streamlit as st
-
-st.write(f"Python utilisé : {sys.executable}")
 
 st.set_page_config(page_title="Projet Accidents routiers", layout="wide")
+
+from pages import exploration, dataviz, modelisation, deeplearning 
+
+
+st.write(f"Python utilisé : {sys.executable}")
 
 st.sidebar.title("Sommaire")
 page = st.sidebar.radio("Aller vers", ["Exploration des données", "Visualisation", "Modélisation","Deep Learning"])

@@ -4,11 +4,23 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, roc_curve, auc
 import matplotlib.pyplot as plt
-
+import os
 # Import des modèles
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# remonter de 3 dossiers
+DATA_RAW_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "data", "raw"))
+DATA_PROCESSED_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "data", "processed"))
+
+usagers_path = os.path.join(DATA_RAW_DIR, "usagers-2019.csv")
+vehicules_path = os.path.join(DATA_RAW_DIR, "vehicules-2019.csv")
+lieux_path = os.path.join(DATA_RAW_DIR, "lieux-2019.csv")
+caracteristiques_path = os.path.join(DATA_RAW_DIR, "caracteristiques-2019.csv")
+accidents_path = os.path.join(DATA_PROCESSED_DIR, "accidents_clean.csv")
 
 def run():
     st.title("Modélisation des accidents")
@@ -16,7 +28,7 @@ def run():
 
     # Chargement des données
     try:
-        df = pd.read_csv("data/processed/accidents_clean.csv")
+        df = pd.read_csv(accidents_path)
     except FileNotFoundError:
         st.error("Fichier 'accidents_clean.csv' introuvable.")
         return

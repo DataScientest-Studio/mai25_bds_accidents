@@ -3,9 +3,19 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# remonter de 3 dossiers
+DATA_RAW_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "data", "raw"))
+DATA_PROCESSED_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "data", "processed"))
 
+usagers_path = os.path.join(DATA_RAW_DIR, "usagers-2019.csv")
+vehicules_path = os.path.join(DATA_RAW_DIR, "vehicules-2019.csv")
+lieux_path = os.path.join(DATA_RAW_DIR, "lieux-2019.csv")
+caracteristiques_path = os.path.join(DATA_RAW_DIR, "caracteristiques-2019.csv")
+accidents_path = os.path.join(DATA_PROCESSED_DIR, "accidents_clean.csv")
 
 def run():
     st.title("Exploration des données")
@@ -13,12 +23,13 @@ def run():
 
     # Chargement
     try:
-        usagers = pd.read_csv("data/raw/usagers-2019.csv", sep=";")
-        vehicules = pd.read_csv("data/raw/vehicules-2019.csv", sep=";")
-        lieux = pd.read_csv("data/raw/lieux-2019.csv", sep=";")
-        caract = pd.read_csv("data/raw/caracteristiques-2019.csv", sep=";")
-        df = pd.read_csv("data/processed/accidents_clean.csv")
+        usagers = pd.read_csv(usagers_path, sep=";")
+        vehicules = pd.read_csv(vehicules_path, sep=";")
+        lieux = pd.read_csv(lieux_path, sep=";")
+        caract = pd.read_csv(caracteristiques_path, sep=";")
+        df = pd.read_csv(accidents_path)
     except FileNotFoundError:
+        st.error(usagers_path)
         st.error("Fichiers manquants dans 'data/raw' ou 'data/processed'.")
         return
 
