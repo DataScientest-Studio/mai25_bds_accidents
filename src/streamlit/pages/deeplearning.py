@@ -1,3 +1,1 @@
 
-
-@st.cache_data

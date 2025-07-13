@@ -10,7 +10,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
-@st.cache_data
 def run():
     st.title("Modélisation des accidents")
     st.markdown("### Sélection du modèle et des paramètres")

@@ -4,40 +4,70 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-@st.cache_data
+
+
 
 def run():
     st.title("Exploration des données")
-    st.write("Affichage des premières lignes des jeux de données...")
+    st.markdown("### Chargement des données")
 
+    # Chargement
+    try:
+        usagers = pd.read_csv("data/raw/usagers-2019.csv", sep=";")
+        vehicules = pd.read_csv("data/raw/vehicules-2019.csv", sep=";")
+        lieux = pd.read_csv("data/raw/lieux-2019.csv", sep=";")
+        caract = pd.read_csv("data/raw/caracteristiques-2019.csv", sep=";")
+        df = pd.read_csv("data/processed/accidents_clean.csv")
+    except FileNotFoundError:
+        st.error("Fichiers manquants dans 'data/raw' ou 'data/processed'.")
+        return
 
-@st.cache_data
+    # Menu de visualisation des fichiers bruts
+    st.markdown("### Aperçu des fichiers bruts")
+    fichier = st.selectbox("Sélectionnez un fichier brut à explorer", ["usagers", "vehicules", "lieux", "caracteristiques"])
+    if fichier == "usagers":
+        st.dataframe(usagers.head(10))
+    elif fichier == "vehicules":
+        st.dataframe(vehicules.head(10))
+    elif fichier == "lieux":
+        st.dataframe(lieux.head(10))
+    elif fichier == "caracteristiques":
+        st.dataframe(caract.head(10))
 
-usagers_2019 = pd.read_csv("data/raw/usagers-2019.csv", sep=';')
-caract_2019 = pd.read_csv("data/raw/caracteristiques-2019.csv", sep=';')
-lieux_2019 = pd.read_csv("data/raw/lieux-2019.csv", sep=';')
-vehicules_2019 = pd.read_csv("data/raw/vehicules-2019.csv", sep=';')
-df_brut = pd.read_csv("data/raw/accidents_2019_2023.csv")
-df = pd.read_csv("../data/processed/accidents_clean.csv")
+    # Aperçu du jeu de données fusionné
+    st.markdown("### Jeu de données fusionné et nettoyé")
+    st.dataframe(df.head(10))
 
-# titre et sommaire sur le côté
-st.title("Projet de prévision des accidents routiers")
-st.sidebar.title("Sommaire")
-pages = ["Exploration de données", "DataVizualization", "Modélisation"]
-page = st.sidebar.radio("Aller vers", pages)
+    # Infos générales
+    st.markdown("### Informations générales")
+    st.write("Nombre de lignes :", df.shape[0])
+    st.write("Nombre de colonnes :", df.shape[1])
+    st.write("Colonnes :", list(df.columns))
+    st.write("Types de variables :")
+    st.dataframe(df.dtypes.astype(str))
 
-# Exploration de données
-st.write("### Introduction")
-st.write("Ce projet a pour but de prédire les accidents routiers en France. Nous allons explorer les données, visualiser les tendances et construire des modèles de prévision.")    
-st.write("Nous sommes parties de 4 catégories de fichiers, Usagers, Caractéristiques, Véhicules et Lieux, que nous avons fusionnées pour obtenir un jeu de données complet. Chaque fichier allant de 2019 à 2023.")
+    # Valeurs manquantes
+    st.markdown("### Valeurs manquantes")
+    nan_df = df.isnull().sum()
+    nan_df = nan_df[nan_df > 0]
+    if not nan_df.empty:
+        st.write(nan_df)
+    else:
+        st.success("Aucune valeur manquante.")
 
-if st.checkbox("Visualiser usagers"):
-     st.dataframe(usagers_2019.head(10))
-if st.checkbox("Visualiser véhicules"):
-    st.dataframe(vehicules_2019.head(10))  
-if st.checkbox("Visualiser lieux"):
-    st.dataframe(lieux_2019.head(10))
-if st.checkbox("Visualiser caractéristiques"):
-    st.dataframe(caract_2019.head(10))
- if st.checkbox("Visualiser les données brutes"):
-     st.dataframe(df_brut.head(10))
+    # Filtre dynamique
+    st.markdown("### Filtrer une colonne")
+    colonne = st.selectbox("Choisissez une colonne pour explorer sa distribution", df.columns)
+    if df[colonne].dtype in [int, float]:
+        fig, ax = plt.subplots()
+        sns.histplot(df[colonne], kde=True, ax=ax)
+        st.pyplot(fig)
+    else:
+        st.write(df[colonne].value_counts())
+
+    # Corrélation (si numérique)
+    st.markdown("### Matrice de corrélation")
+    num_cols = df.select_dtypes(include=["int", "float"])
+    fig_corr, ax_corr = plt.subplots(figsize=(10, 8))
+    sns.heatmap(num_cols.corr(), cmap="coolwarm", annot=True, fmt=".2f", ax=ax_corr)
+    st.pyplot(fig_corr)
