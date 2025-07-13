@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-@st.cache_data
 
 def run():
     st.title("Visualisation des données")
