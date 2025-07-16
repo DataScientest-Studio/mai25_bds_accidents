@@ -47,7 +47,7 @@ def run():
 
     # Aperçu du jeu de données fusionné
     st.markdown("### Jeu de données fusionné avant netttoyage")
-    st.dataframe(df.head(10))
+    st.dataframe(df.head(5))
 
     # Informations générales détaillées avec détection des variables catégorielles et nombre de catégories
     st.markdown("### Informations générales détaillées")
