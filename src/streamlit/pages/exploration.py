@@ -15,7 +15,7 @@ usagers_path = os.path.join(DATA_RAW_DIR, "usagers-2019.csv")
 vehicules_path = os.path.join(DATA_RAW_DIR, "vehicules-2019.csv")
 lieux_path = os.path.join(DATA_RAW_DIR, "lieux-2019.csv")
 caracteristiques_path = os.path.join(DATA_RAW_DIR, "caracteristiques-2019.csv")
-accidents_path = os.path.join(DATA_PROCESSED_DIR, "accidents_clean.csv")
+accidents_path = os.path.join(DATA_RAW_DIR, "accidents_2019_2023.csv")
 
 def run():
     st.title("Exploration des données")
@@ -46,25 +46,52 @@ def run():
         st.dataframe(caract.head(10))
 
     # Aperçu du jeu de données fusionné
-    st.markdown("### Jeu de données fusionné et nettoyé")
+    st.markdown("### Jeu de données fusionné avant netttoyage")
     st.dataframe(df.head(10))
 
-    # Infos générales
-    st.markdown("### Informations générales")
-    st.write("Nombre de lignes :", df.shape[0])
-    st.write("Nombre de colonnes :", df.shape[1])
-    st.write("Colonnes :", list(df.columns))
-    st.write("Types de variables :")
-    st.dataframe(df.dtypes.astype(str))
+    # Informations générales détaillées avec détection des variables catégorielles et nombre de catégories
+    st.markdown("### Informations générales détaillées")
 
-    # Valeurs manquantes
-    st.markdown("### Valeurs manquantes")
-    nan_df = df.isnull().sum()
-    nan_df = nan_df[nan_df > 0]
-    if not nan_df.empty:
-        st.write(nan_df)
-    else:
-        st.success("Aucune valeur manquante.")
+    infos = []
+
+    for col in df.columns:
+        dtype = str(df[col].dtype)
+        missing = df[col].isna().sum()
+
+        unique_vals = df[col].dropna().unique()
+
+        # Détection des variables catégorielles : valeurs numériques comprises entre -1 et 99
+        if pd.api.types.is_numeric_dtype(df[col]) and np.all((unique_vals >= -1) & (unique_vals <= 99)):
+            is_cat = "Oui"
+            nb_categories = df[col].nunique(dropna=True)
+        else:
+            is_cat = "Non"
+            nb_categories = "-"
+
+        if pd.api.types.is_numeric_dtype(df[col]):
+            min_val = df[col].min()
+            max_val = df[col].max()
+            mean_val = df[col].mean()
+        else:
+            min_val = "-"
+            max_val = "-"
+            mean_val = "-"
+
+        infos.append({
+            "Colonne": col,
+            "Type": dtype,
+            "Catégorielle": is_cat,
+            "Nb catégories": nb_categories,
+            "Valeurs manquantes": missing,
+            "Min": min_val,
+            "Max": max_val,
+            "Moyenne": mean_val
+        })
+
+    infos_df = pd.DataFrame(infos)
+    st.dataframe(infos_df)
+
+
 
     # Filtre dynamique
     st.markdown("### Filtrer une colonne")
@@ -76,9 +103,28 @@ def run():
     else:
         st.write(df[colonne].value_counts())
 
-    # Corrélation (si numérique)
-    st.markdown("### Matrice de corrélation")
-    num_cols = df.select_dtypes(include=["int", "float"])
-    fig_corr, ax_corr = plt.subplots(figsize=(10, 8))
-    sns.heatmap(num_cols.corr(), cmap="coolwarm", annot=True, fmt=".2f", ax=ax_corr)
-    st.pyplot(fig_corr)
+        # Corrélation avec 'grav'
+    st.markdown("### Corrélation avec la variable 'grav'")
+
+    if "grav" not in df.columns:
+        st.warning("La variable 'grav' n'existe pas dans le jeu de données.")
+    else:
+        numeric_cols = df.select_dtypes(include=["int", "float"]).columns.tolist()
+        numeric_cols = [col for col in numeric_cols if col != "grav"]
+
+        selected_cols = st.multiselect(
+            "Sélectionnez les variables numériques à corréler avec 'grav'",
+            options=numeric_cols,
+            default=numeric_cols[:5]  # pré-sélectionne les 5 premières
+        )
+
+        if selected_cols:
+            corr_df = df[["grav"] + selected_cols].corr()
+
+            fig_corr, ax_corr = plt.subplots(figsize=(1 + len(selected_cols), 5))
+            sns.heatmap(corr_df[["grav"]].loc[selected_cols], annot=True, cmap="coolwarm", fmt=".2f", ax=ax_corr)
+            ax_corr.set_title("Corrélation des variables sélectionnées avec 'grav'")
+            st.pyplot(fig_corr)
+        else:
+            st.info("Veuillez sélectionner au moins une variable.")
+
