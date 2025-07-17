@@ -5,10 +5,17 @@ import folium
 import numpy as np 
 import seaborn as sns
 import matplotlib.pyplot as plt
-path1 = os.path.join( "..", "data", "processed", "accidents_2019_2023.csv")
-accidents= pd.read_csv(path1)
-path2 = os.path.join( "..", "data", "processed", "accidents_clean.csv")
-accidents_clean= pd.read_csv(path2)
+
+# Définition des chemins
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_RAW_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "data", "raw"))
+DATA_PROCESSED_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "data", "processed"))
+accidents_raw_path = os.path.join(DATA_RAW_DIR, "accidents_2019_2023.csv")
+accidents_clean_path = os.path.join(DATA_PROCESSED_DIR, "accidents_clean.csv")
+
+
+accidents_raw= pd.read_csv(accidents_raw_path)
+accidents= pd.read_csv(accidents_clean_path)
 
 
 # Visualisation de la gravité des accidents
@@ -19,7 +26,7 @@ fig, axes = plt.subplots(1, 2, figsize=(14, 5), sharey=True)
 
 # Histogramme normalisé pour 2004–2018
 sns.histplot(
-    accidents_1['grav'], 
+    accidents_raw['grav'], 
     bins=10, 
     stat="density",  # Normalisation
     kde=False, 
@@ -33,7 +40,7 @@ axes[0].grid(True)
 
 # Histogramme normalisé pour 2019–2023
 sns.histplot(
-    accidents_2['grav'], 
+    accidents_raw['grav'], 
     bins=10, 
     stat="density",  # Normalisation
     kde=False, 
@@ -48,18 +55,6 @@ plt.tight_layout()
 plt.show()
 
 # Evolution hebdomadaire du nombre d'accidents par gravité
-accidents = accidents[accidents['grav'] != -1]
-accidents['grav'] = accidents['grav'].replace({2: 42})
-accidents['grav'] = accidents['grav'].replace({4: 2})
-accidents['grav'] = accidents['grav'].replace({42: 4})
-
-accidents['datetime_string'] = (
-    accidents['an'].astype(str) + '-' +
-    accidents['mois'].astype(str).str.zfill(2) + '-' +
-    accidents['jour'].astype(str).str.zfill(2)
-    
-)
-accidents['date'] = pd.to_datetime(accidents['datetime_string'], format='%Y-%m-%d')
 accidents = accidents.drop('datetime_string',axis=1)
 accidents['date'] = pd.to_datetime(accidents['date'], errors='coerce')
 accidents['week'] = accidents['date'].dt.to_period('W').dt.start_time
@@ -74,7 +69,7 @@ plt.show()
 
 # Visualisation de la répartition des accidents par tranche d'âge
 plt.figure(figsize=(10, 6))
-sns.histplot(data=accidents_clean, x='age', hue='grav', kde=True, multiple='stack', palette='viridis')
+sns.histplot(data=accidents, x='age', hue='grav', kde=True, multiple='stack', palette='viridis')
 plt.title(f"Distribution de l'age en fonction de la gravité de l'accident")
 plt.savefig("../reports/figures/1.0-Seb-age_gravite.png")
 plt.show()
@@ -85,7 +80,7 @@ plt.show()
 # Cluster Geo
 taille_cellule = 0.05  # ~5 km
 
-accidents_clean = accidents_clean.dropna(subset=['lat', 'long']).copy()
+accidents_clean = accidents.dropna(subset=['lat', 'long']).copy()
 accidents_clean['cell_x'] = (accidents_clean['long'] // taille_cellule).astype(int)
 accidents_clean['cell_y'] = (accidents_clean['lat'] // taille_cellule).astype(int)
 
@@ -125,4 +120,3 @@ for _, row in grille.iterrows():
         popup=f"{row['nb_accidents']} accidents<br>Gravité médiane : {grav}"
     ).add_to(m)
 
-m

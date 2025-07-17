@@ -58,10 +58,12 @@ accidents.to_csv("data/raw/accidents_2019_2023.csv", index=False)
 accidents = accidents.drop_duplicates(subset=['Num_Acc','id_vehicule','num_veh','place','grav'])
 
 # Conversion en float des colonnes lat et long
-accidents['lat'] = accidents['lat'].str.replace(',', '.')
-accidents['long'] = accidents['long'].str.replace(',', '.')
-accidents['lat'] = accidents['lat'].astype(float)
-accidents['long'] = accidents['long'].astype(float)
+accidents['lat'] = accidents['lat'].str.replace(',', '.').astype(float, errors='coerce')
+accidents['long'] = accidents['long'].str.replace(',', '.').astype(float, errors='coerce')
+
+
+# Nettoyage des departements
+accidents['dep'] = accidents['dep'].astype(str).str.zfill(2)
 
 # changement ordre de gravité pour avoir un ordre logique 
 accidents['grav'] = accidents['grav'].replace({2: 42})
@@ -91,8 +93,6 @@ accidents_copy = accidents_copy.drop('datetime_string',axis=1)
 # Suppression des colonnes inutiles
 accidents_copy = accidents_copy.drop(['pr','pr1','senc'],axis=1)
 accidents_copy = accidents_copy.drop(['voie','adr'],axis=1)
-
-
 
 
 # remplacement des valeurs manquante de sexe suivant leur proportion dans la catégorie
@@ -255,7 +255,8 @@ mapping_cat_veh = {old: new for new, olds in cat_vehicules_regroupées.items() f
 accidents_copy['catv_regroupée'] = accidents_copy['catv'].map(mapping_cat_veh)
 
 # Export fichier nettoyé
-accidents_copy.to_csv("/Users/alizeeblanchon/Documents/Data_Scientist/data_project/mai25_bds_accidents/data/processed/accidents_clean.csv", index=False)
+# Changer le chemin
+# accidents_copy.to_csv("/Users/alizeeblanchon/Documents/Data_Scientist/data_project/mai25_bds_accidents/data/processed/accidents_clean.csv", index=False)
 
 
 

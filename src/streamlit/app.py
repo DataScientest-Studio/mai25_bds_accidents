@@ -1,18 +1,32 @@
 import streamlit as st
 import sys
 
+# Configuration en tout premier
 st.set_page_config(page_title="Projet Accidents routiers", layout="wide")
 
-st.set_page_config(page_title="Projet Accidents routiers", layout="wide")
+# Import avec gestion d'erreur
+try:
+    from onglet import exploration, dataviz, modelisation, deeplearning, visualize
+except Exception as e:
+    st.sidebar.error(f"Erreur d'import : {e}")
 
-# Renommé ici
-from onglet import exploration, dataviz, modelisation, deeplearning
-
+# Affichage de debug
 st.write(f"Python utilisé : {sys.executable}")
 
+# Barre latérale
 st.sidebar.title("Sommaire")
-page = st.sidebar.radio("Aller vers", ["Exploration des données", "Visualisation", "Modélisation", "Deep Learning"])
+page = st.sidebar.radio(
+    "Aller vers",
+    [
+        "Exploration des données",
+        "Visualisation",
+        "Modélisation",
+        "Deep Learning"
+    ],
+    index=0  # optionnel
+)
 
+# Routing
 if page == "Exploration des données":
     exploration.run()
 elif page == "Visualisation":
@@ -21,4 +35,3 @@ elif page == "Modélisation":
     modelisation.run()
 elif page == "Deep Learning":
     deeplearning.run()
-
