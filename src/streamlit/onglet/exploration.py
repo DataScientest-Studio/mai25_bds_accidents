@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+from PIL import Image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -45,6 +46,11 @@ def run():
     elif fichier == "caracteristiques":
         st.dataframe(caract.head(10))
 
+# Charger une image depuis un fichier
+    image = Image.open('/Users/alizeeblanchon/Documents/Data_Scientist/data_project/mai25_bds_accidents/reports/figures/Jointure tables.png')
+
+    # Afficher l'image dans Streamlit
+    st.image(image, caption='Jointures des tables 2019 - 2023', use_column_width=True)
     # Aperçu du jeu de données fusionné
     st.markdown("### Jeu de données fusionné avant netttoyage")
     st.dataframe(df.head(5))
