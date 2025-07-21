@@ -15,6 +15,7 @@ DATA_PROCESSED_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "d
 
 accidents_path = os.path.join(DATA_PROCESSED_DIR, "accidents_clean.csv")
 
+
 def run():
     # Style et titre
     st.markdown("""
@@ -47,6 +48,9 @@ def run():
 
     # Chargement des données
     accidents = pd.read_csv(accidents_path)
+    #Clean des departement pour etre sur
+    accidents['dep'] = accidents['dep'].astype(str).str.zfill(2)
+
 
     # Extraction de l’année
     accidents['Num_Acc'] = accidents['Num_Acc'].astype(str)
