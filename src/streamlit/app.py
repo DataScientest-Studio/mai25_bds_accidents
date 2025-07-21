@@ -6,12 +6,9 @@ st.set_page_config(page_title="Projet Accidents routiers", layout="wide")
 
 # Import avec gestion d'erreur
 try:
-    from onglet import exploration, dataviz, modelisation, deeplearning, visualize
+    from onglet import exploration, dataviz, modelisation, deeplearning
 except Exception as e:
     st.sidebar.error(f"Erreur d'import : {e}")
-
-# Affichage de debug
-st.write(f"Python utilisé : {sys.executable}")
 
 # Barre latérale
 st.sidebar.title("Sommaire")
