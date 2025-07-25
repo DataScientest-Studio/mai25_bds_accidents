@@ -57,7 +57,7 @@ def run():
     accidents['an'] = accidents['Num_Acc'].str[:4].astype(int)
 
     # Sélection de l'année via la barre latérale
-    year_selected = st.sidebar.selectbox("📅 Sélectionnez une année", sorted(accidents['an'].unique()), index=len(accidents['an'].unique()) - 1)
+    year_selected = st.sidebar.selectbox("Sélectionnez une année", sorted(accidents['an'].unique()), index=len(accidents['an'].unique()) - 1)
     df_year = accidents[accidents['an'] == year_selected].copy()
 
 
