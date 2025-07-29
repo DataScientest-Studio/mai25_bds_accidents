@@ -6,7 +6,7 @@ st.set_page_config(page_title="Projet Accidents routiers", layout="wide")
 
 # Import avec gestion d'erreur
 try:
-    from onglet import exploration, dataviz, modelisation, deeplearning
+    from onglet import Introduction,exploration, dataviz, modelisation, deeplearning
 except Exception as e:
     st.sidebar.error(f"Erreur d'import : {e}")
 
@@ -15,6 +15,7 @@ st.sidebar.title("Sommaire")
 page = st.sidebar.radio(
     "Aller vers",
     [
+        "Introduction",
         "Exploration des données",
         "Visualisation",
         "Modélisation",

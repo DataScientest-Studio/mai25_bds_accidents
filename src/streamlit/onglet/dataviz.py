@@ -13,7 +13,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_RAW_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "data", "raw"))
 DATA_PROCESSED_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "data", "processed"))
 
-accidents_path = os.path.join(DATA_PROCESSED_DIR, "accidents_clean.csv")
+accidents_path = os.path.join(DATA_RAW_DIR, "accidents_2019_2023.csv")
 
 
 def run():
@@ -120,6 +120,42 @@ def run():
         top_dep.columns = ['Département', 'Nombre d\'accidents']
         st.dataframe(top_dep, use_container_width=True)
 
+        # 📊 RÉPARTITION DES CLASSES DE GRAVITÉ
+    
+    st.markdown("### 📊 Répartition des classes de gravité")
+
+    fig1, ax1 = plt.subplots()
+    grav_counts = df_year['grav'].value_counts().sort_index()
+    grav_counts.plot(kind='bar', color='salmon', ax=ax1)
+
+    # Corriger les ticks pour coller aux indices réels
+    ax1.set_xticks(grav_counts.index)
+    ax1.set_xticklabels(['Indemne', 'Blessé léger', 'Hospitalisé', 'Décès'], rotation=0)
+    ax1.set_ylabel("Nombre d'accidents")
+    ax1.set_title(f"Gravité des accidents en {year_selected}")
+    st.pyplot(fig1)
+
+
+    # ⏰ GRAVITÉ MOYENNE SELON L'HEURE DE LA JOURNÉE
+    if 'hrmn' in df_year.columns:
+        st.markdown("### ⏰ Gravité moyenne selon l'heure de la journée")
+
+        # Extraction de l'heure si elle est au format HHMM
+        df_year['heure'] = df_year['hrmn'].astype(str).str.zfill(4).str[:2].astype(int)
+        gravite_par_heure = df_year.groupby('heure')['grav'].mean()
+
+        fig2, ax2 = plt.subplots()
+        sns.lineplot(x=gravite_par_heure.index, y=gravite_par_heure.values, marker='o', ax=ax2, color='darkblue')
+        ax2.set_xlabel("Heure")
+        ax2.set_ylabel("Gravité moyenne")
+        ax2.set_title(f"Gravité moyenne par heure de la journée ({year_selected})")
+        ax2.set_xticks(range(0, 24))
+        st.pyplot(fig2)
+    else:
+        st.info("La colonne 'hrmn' n'est pas disponible pour analyser la gravité par heure.")
+
+
     st.markdown("---")
+
     st.caption("© Données accidents – projet DataScientest")
 
